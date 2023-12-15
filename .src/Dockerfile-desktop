@@ -1,0 +1,29 @@
+FROM python:3.9
+
+ENV DISPLAY :0
+
+ENV USERNAME developer
+
+ENV BUCK2_GIT https://github.com/facebook/buck2.git
+
+WORKDIR /workspace
+
+RUN apt update && apt install -y ruby sudo
+
+# create and switch to a user
+RUN echo "backus ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN useradd --no-log-init --home-dir /home/$USERNAME --create-home --shell /bin/bash $USERNAME
+RUN adduser $USERNAME sudo
+USER $USERNAME
+
+WORKDIR /home/$USERNAME
+
+RUN git clone $BUCK2_GIT \
+    && cp -R buck2/prelude . \
+    && cp -R buck2/shim .
+    
+COPY bin .
+
+RUN ./requiements.sh
+
+CMD [""]
